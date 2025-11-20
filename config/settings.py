@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
+import dj_database_url # <--- Añadir esto
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,9 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-uz-jq_g9q^vmuaf+p79efi-*hhbui9ym4tfba%h3%k(4rmmfdv'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# En producción DEBUG debe ser False, pero Render lo maneja con variables de entorno
+DEBUG = 'RENDER' not in os.environ
 
-ALLOWED_HOSTS = []
+# Aceptamos cualquier host para evitar errores al desplegar
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -47,12 +50,14 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # <--- AÑADIR ESTA LÍNEA AQUÍ
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -126,3 +131,21 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# --- BASE DE DATOS ---
+# Esto le dice a Django: "Si estás en Render, usa su base de datos PostgreSQL. Si no, usa SQLite local".
+DATABASES = {
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',
+        conn_max_age=600
+    )
+}
+
+# --- ARCHIVOS ESTÁTICOS ---
+STATIC_URL = 'static/'
+
+# Esta carpeta NO la creas tú, la crea Django al desplegar
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Habilitar compresión y almacenamiento de WhiteNoise
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
