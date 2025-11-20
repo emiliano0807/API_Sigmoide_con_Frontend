@@ -1,0 +1,25 @@
+# --- Python y Bytecode (Archivos compilados) ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# --- Django ---
+db.sqlite3
+local_settings.py
+/media/
+/static/
+
+# --- Entornos Virtuales (¡Muy Importante!) ---
+venv/
+env/
+.env
+.venv/
+
+# --- Archivos del Sistema Operativo ---
+.DS_Store
+Thumbs.db
+
+# --- IDEs (Opcional) ---
+.vscode/
+.idea/
